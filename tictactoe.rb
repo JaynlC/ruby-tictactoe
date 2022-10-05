@@ -1,16 +1,17 @@
 class Board
-  attr_reader :board
+  attr_accessor :board
 
   def initialize()
     @board = [
       [" A1 ", " A2 ", " A3 "], 
       [" B1 ", " B2 ", " B3 "], 
       [" C1 ", " C2 ", " C3 "]]
+      # puts board
   end
 
-  def create_board
+  def create_board(board)
     puts "\n----------------"
-    self.board.each do |row|
+    board.each do |row|
       print "|"
       row.each do |cell|
         print "#{cell}|"
@@ -30,17 +31,6 @@ class Player
 end
 
 class MainGame < Board
-  # present grid //
-  # prompt player to choose first spot (and if wanna go first). 
-  # if player picks a spot that is not a1 - c3, try again. (until method)
-  # populate and update the grid based on indices
-  # let CPU pick a spot based on player choice. Ensure cannot pick taken spot. 
-  # player pick next spot (back to until method)
-  # run a method that runs as soon player picks a spot. It checks at end of loop if winner. If not, ignore the method. 
-  
-  # Method to reset the game. 
-  # Can run a count on number of times PC or player won the game. 
-  
   attr_accessor :player_symbol, :player_choice, :game_board
 
   def message(player)
@@ -54,42 +44,81 @@ class MainGame < Board
         @symbol_choice = true
       end
     end
-    present_board()
-  end
-  
-  def present_board
-    @game_board = Board.new.create_board
+    @game_board = Board.new.create_board(board)
     player_choices()
   end
 
   def player_choices
     # check choice is valid
     @choice_complete = false  
-    catch (:check_choice) do
+    # catch (:check_choice) do
       until @choice_complete
         puts "Type the position string (e.g. A1) you want to choose:"
-        @player_choice = gets.chomp.upcase
-        game_board.each do |row|
-          row.each do |cell|
-            if @player_choice == cell.strip
-              puts "You have selected #{@player_choice}"
-              cell = " #{@player_choice} " # not working, debug
-              @choice_complete = true
-              throw :check_choice
-            end
-          end
-        end
+        @player_choice = gets.chomp.strip.upcase
+        
+        @updated_board = game_board.each{|row| row.replace(row.map {|cell| cell.strip == @player_choice ? cell = " #{player_symbol} " : cell = cell })}
+        @choice_complete = true
+        # @updated_board = game_board.each{|row| row.replace(row.map do |cell|
+        #   if @player_choice == cell.strip
+        #     cell =  player_symbol
+        #     puts "This is #{cell}"
+        #     @choice_complete = true
+        #     # throw :check_choice
+        #   end 
+        # end )}
+
+        #   game_board.each do |row|
+        #   row.each do |cell|
+        #     if @player_choice == cell.strip
+        #       puts "This is #{cell}"
+        #       puts "You have selected #{@player_choice}"
+        #       puts "This is #{player_symbol}"
+              
+        #       cell = " #{player_symbol} "
+        #       puts cell
+        #       @choice_complete = true
+        #       throw :check_choice
+        #     end
+        #   end
+        # end
       end
-    end
-    puts game_board
-    game_board.create_board  # This is not working, debug
+    # end # catch loop
+    puts "Position #{player_choice} is updated on the board below: "
+    # puts @updated_board
+    create_board(@updated_board)
     compute_choice()
   end
 
   def compute_choice
     puts "resume from here"
   end
+
+  def winner
+
+  end
+
 end
 
 player = Player.new
 test = MainGame.new.message(player)
+
+
+# @updated_board = game_board.each{|row| row.replace(row.map do |cell|
+#   if @player_choice == cell.strip
+#     cell = " #{player_symbol} " 
+#     @choice_complete = true
+#     throw :check_choice
+#   end 
+# end )}
+
+# To do:
+# present grid //
+  # prompt player to choose first spot (and if wanna go first). 
+  # if player picks a spot that is not a1 - c3, try again. (until method)
+  # populate and update the grid based on indices
+  # let CPU pick a spot based on player choice. Ensure cannot pick taken spot. 
+  # player pick next spot (back to until method)
+  # run a method that runs as soon player picks a spot. It checks at end of loop if winner. If not, ignore the method. 
+  
+  # Method to reset the game. 
+  # Can run a count on number of times PC or player won the game. 
