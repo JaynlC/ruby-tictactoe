@@ -1,3 +1,11 @@
+require "matrix"
+
+module MatrixIndex
+  def matrix_index(array, value)
+    Matrix[*array].index(value)
+  end
+end
+
 class Board
   attr_accessor :board
 
@@ -31,7 +39,8 @@ class Player
 end
 
 class MainGame < Board
-  attr_accessor :player_symbol, :player_choice, :game_board
+  
+  attr_accessor :player_symbol, :player_choice, :game_board, :random_choice
 
   def message(player)
     puts "Welcome #{player.name} to TicTacToe!"
@@ -55,13 +64,12 @@ class MainGame < Board
       puts "Type the position string (e.g. A1) you want to choose:"
       @player_choice = gets.chomp.strip.upcase
       # Edit code to ensure correct position can only be chosen.
-      @updated_board = game_board.each{|row| row.replace(row.map {|cell| cell.strip == @player_choice ? cell = " #{player_symbol} " : cell = cell })}
+      @updated_board = game_board.each{|row| row.replace(row.map {|cell| cell.strip == player_choice ? cell = " #{player_symbol} " : cell = cell })}
       @choice_complete = true
     end
     puts "You chose #{player_choice} as shown on the board below: "
     create_board(@updated_board)
     computer_choice()
-    winner?()
   end
 
   def computer_choice
@@ -75,7 +83,7 @@ class MainGame < Board
     until computer_selected
       i = rand(3)
       j = rand(3)
-      random_choice = @updated_board[i][j]
+      @random_choice = @updated_board[i][j]
       if (random_choice.strip != player_symbol) && (random_choice.strip != @computer_symbol)
         @updated_board[i][j] = " #{@computer_symbol} "
         computer_selected = true
@@ -83,28 +91,45 @@ class MainGame < Board
     end
     puts "In response, the Computer with symbol #{@computer_symbol} has Selected the position #{random_choice}:"
     create_board(@updated_board)
-    winner?()
+    winner()
   end
 
-  def winner?
-    #Resume here.
-    # if array combination indices matched, then announce winner and stop game. Else nothing. 
+  def winner
+    # assess if matched indices add to three, i.e. 3 rows or three columns of same symbol.
+    # include MatrixIndex  
+    # @player_index = matrix_index(game_board, player_choice)
+    # @Computer_index = matrix_index(game_board, random_choice)
+    
+    # brute force method:
+      for i in (0..2)
+        if (@updated_board[i][0] == @updated_board[i][1]) && (@updated_board[i][1] == @updated_board[i][2])
+          winner = @updated_board[i][0].strip
+          @winner_declared = true
+          declare_winner()
+        elsif (@updated_board[0][i] == @updated_board[1][i]) && (@updated_board[1][i] == @updated_board[2][i])
+          winner = @updated_board[0][i].strip
+          @winner_declared = true
+          declare_winner()
+        else player_choices()
+        end
+      end
+    end
   end
 
+  def declare_winner
+    if winner == player_symbol
+      puts "Congratulations #{name}, you win!"
+      end_game()
+    elsif winner == computer_symbol
+      puts "Computer Wins this time, better luck next time #{name}!"
+      end_game()
+    end
+  end
+
+  def end_game
+    puts "Restart game or refresh to play again"
+  end
 end
 
 player = Player.new
 test = MainGame.new.message(player)
-
-
-# To do:
-# present grid //
-  # prompt player to choose first spot (and if wanna go first). 
-  # if player picks a spot that is not a1 - c3, try again. (until method)
-  # populate and update the grid based on indices
-  # let CPU pick a spot based on player choice. Ensure cannot pick taken spot. 
-  # player pick next spot (back to until method)
-  # run a method that runs as soon player picks a spot. It checks at end of loop if winner. If not, ignore the method. 
-  
-  # Method to reset the game. 
-  # Can run a count on number of times PC or player won the game. 
