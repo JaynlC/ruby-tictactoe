@@ -51,50 +51,44 @@ class MainGame < Board
   def player_choices
     # check choice is valid
     @choice_complete = false  
-    # catch (:check_choice) do
-      until @choice_complete
-        puts "Type the position string (e.g. A1) you want to choose:"
-        @player_choice = gets.chomp.strip.upcase
-        
-        @updated_board = game_board.each{|row| row.replace(row.map {|cell| cell.strip == @player_choice ? cell = " #{player_symbol} " : cell = cell })}
-        @choice_complete = true
-        # @updated_board = game_board.each{|row| row.replace(row.map do |cell|
-        #   if @player_choice == cell.strip
-        #     cell =  player_symbol
-        #     puts "This is #{cell}"
-        #     @choice_complete = true
-        #     # throw :check_choice
-        #   end 
-        # end )}
-
-        #   game_board.each do |row|
-        #   row.each do |cell|
-        #     if @player_choice == cell.strip
-        #       puts "This is #{cell}"
-        #       puts "You have selected #{@player_choice}"
-        #       puts "This is #{player_symbol}"
-              
-        #       cell = " #{player_symbol} "
-        #       puts cell
-        #       @choice_complete = true
-        #       throw :check_choice
-        #     end
-        #   end
-        # end
-      end
-    # end # catch loop
-    puts "Position #{player_choice} is updated on the board below: "
-    # puts @updated_board
+    until @choice_complete
+      puts "Type the position string (e.g. A1) you want to choose:"
+      @player_choice = gets.chomp.strip.upcase
+      # Edit code to ensure correct position can only be chosen.
+      @updated_board = game_board.each{|row| row.replace(row.map {|cell| cell.strip == @player_choice ? cell = " #{player_symbol} " : cell = cell })}
+      @choice_complete = true
+    end
+    puts "You chose #{player_choice} as shown on the board below: "
     create_board(@updated_board)
-    compute_choice()
+    computer_choice()
+    winner?()
   end
 
-  def compute_choice
-    puts "resume from here"
+  def computer_choice
+    if (player_symbol == "X")
+      @computer_symbol = "O"
+    elsif (player_symbol == "O")
+      @computer_symbol = "X"
+    end
+    
+    computer_selected = false
+    until computer_selected
+      i = rand(3)
+      j = rand(3)
+      random_choice = @updated_board[i][j]
+      if (random_choice.strip != player_symbol) && (random_choice.strip != @computer_symbol)
+        @updated_board[i][j] = " #{@computer_symbol} "
+        computer_selected = true
+      end
+    end
+    puts "In response, the Computer with symbol #{@computer_symbol} has Selected the position #{random_choice}:"
+    create_board(@updated_board)
+    winner?()
   end
 
-  def winner
-
+  def winner?
+    #Resume here.
+    # if array combination indices matched, then announce winner and stop game. Else nothing. 
   end
 
 end
@@ -102,14 +96,6 @@ end
 player = Player.new
 test = MainGame.new.message(player)
 
-
-# @updated_board = game_board.each{|row| row.replace(row.map do |cell|
-#   if @player_choice == cell.strip
-#     cell = " #{player_symbol} " 
-#     @choice_complete = true
-#     throw :check_choice
-#   end 
-# end )}
 
 # To do:
 # present grid //
