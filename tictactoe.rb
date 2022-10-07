@@ -1,11 +1,3 @@
-require "matrix"
-
-module MatrixIndex
-  def matrix_index(array, value)
-    Matrix[*array].index(value)
-  end
-end
-
 class Board
   attr_accessor :board
 
@@ -14,7 +6,6 @@ class Board
       [" A1 ", " A2 ", " A3 "], 
       [" B1 ", " B2 ", " B3 "], 
       [" C1 ", " C2 ", " C3 "]]
-      # puts board
   end
 
   def create_board(board)
@@ -42,6 +33,8 @@ class MainGame < Board
   
   attr_accessor :player_symbol, :player_choice, :game_board, :random_choice, :updated_board, :winner, :name
 
+  @@count_turns = 0
+
   def message(player)
     puts "Welcome #{player.name} to TicTacToe!"
     @symbol_choice = false
@@ -67,9 +60,10 @@ class MainGame < Board
       @updated_board = game_board.each{|row| row.replace(row.map {|cell| cell.strip == player_choice ? cell = " #{player_symbol} " : cell = cell })}
       @choice_complete = true
     end
+    @@count_turns += 1
     puts "You chose #{player_choice} as shown on the board below: "
     create_board(updated_board)
-    computer_choice()
+    @@count_turns == 9 ? draw_message() : computer_choice()
   end
 
   def computer_choice
@@ -89,6 +83,7 @@ class MainGame < Board
         computer_selected = true
       end
     end
+    @@count_turns += 1
     puts "In response, the Computer with symbol #{@computer_symbol} has Selected the position #{random_choice}:"
     create_board(updated_board)
     win_check()
@@ -96,16 +91,25 @@ class MainGame < Board
 
   def win_check
     @winner_declared = false
+    # check rows and columns for win
     for i in (0..2)
-      if (@updated_board[i][0] == updated_board[i][1]) && (updated_board[i][1] == updated_board[i][2])
+      if (updated_board[i][0] == updated_board[i][1]) && (updated_board[i][1] == updated_board[i][2])
         @winner = updated_board[i][0].strip
         @winner_declared = true
         break 
-      elsif (updated_board[0][i] == @updated_board[1][i]) && (updated_board[1][i] == updated_board[2][i])
+      elsif (updated_board[0][i] == updated_board[1][i]) && (updated_board[1][i] == updated_board[2][i])
         @winner = updated_board[0][i].strip
         @winner_declared = true
         break
       end
+    end
+    # check diagonally for win
+    if (updated_board[0][0] == updated_board[1][1]) && (updated_board[1][1] == updated_board[2][2])
+      @winner = updated_board[0][0].strip
+      @winner_declared = true
+    elsif (updated_board[2][0] == updated_board[1][1]) && (updated_board[1][1] == updated_board[0][2])
+      @winner = updated_board[2][0].strip
+      @winner_declared = true
     end
     @winner_declared ? win_message() : player_choices()
   end
@@ -118,6 +122,11 @@ class MainGame < Board
       puts "Computer wins this time, better luck next time #{self.name}!"
       end_game()
     end
+  end
+
+  def draw_message
+    puts "This game is a draw, close one!"
+    end_game()
   end
 
   def end_game
