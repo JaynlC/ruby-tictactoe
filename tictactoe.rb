@@ -40,7 +40,7 @@ end
 
 class MainGame < Board
   
-  attr_accessor :player_symbol, :player_choice, :game_board, :random_choice
+  attr_accessor :player_symbol, :player_choice, :game_board, :random_choice, :updated_board, :winner, :name
 
   def message(player)
     puts "Welcome #{player.name} to TicTacToe!"
@@ -68,7 +68,7 @@ class MainGame < Board
       @choice_complete = true
     end
     puts "You chose #{player_choice} as shown on the board below: "
-    create_board(@updated_board)
+    create_board(updated_board)
     computer_choice()
   end
 
@@ -83,51 +83,45 @@ class MainGame < Board
     until computer_selected
       i = rand(3)
       j = rand(3)
-      @random_choice = @updated_board[i][j]
+      @random_choice = updated_board[i][j]
       if (random_choice.strip != player_symbol) && (random_choice.strip != @computer_symbol)
-        @updated_board[i][j] = " #{@computer_symbol} "
+        updated_board[i][j] = " #{@computer_symbol} "
         computer_selected = true
       end
     end
     puts "In response, the Computer with symbol #{@computer_symbol} has Selected the position #{random_choice}:"
-    create_board(@updated_board)
-    winner()
+    create_board(updated_board)
+    win_check()
   end
 
-  def winner
-    # assess if matched indices add to three, i.e. 3 rows or three columns of same symbol.
-    # include MatrixIndex  
-    # @player_index = matrix_index(game_board, player_choice)
-    # @Computer_index = matrix_index(game_board, random_choice)
-    
-    # brute force method:
-      for i in (0..2)
-        if (@updated_board[i][0] == @updated_board[i][1]) && (@updated_board[i][1] == @updated_board[i][2])
-          winner = @updated_board[i][0].strip
-          @winner_declared = true
-          declare_winner()
-        elsif (@updated_board[0][i] == @updated_board[1][i]) && (@updated_board[1][i] == @updated_board[2][i])
-          winner = @updated_board[0][i].strip
-          @winner_declared = true
-          declare_winner()
-        else player_choices()
-        end
+  def win_check
+    @winner_declared = false
+    for i in (0..2)
+      if (@updated_board[i][0] == updated_board[i][1]) && (updated_board[i][1] == updated_board[i][2])
+        @winner = updated_board[i][0].strip
+        @winner_declared = true
+        break 
+      elsif (updated_board[0][i] == @updated_board[1][i]) && (updated_board[1][i] == updated_board[2][i])
+        @winner = updated_board[0][i].strip
+        @winner_declared = true
+        break
       end
     end
+    @winner_declared ? win_message() : player_choices()
   end
 
-  def declare_winner
+  def win_message
     if winner == player_symbol
-      puts "Congratulations #{name}, you win!"
+      puts "Congratulations #{self.name}, You Win!"
       end_game()
-    elsif winner == computer_symbol
-      puts "Computer Wins this time, better luck next time #{name}!"
+    elsif winner == @computer_symbol
+      puts "Computer wins this time, better luck next time #{self.name}!"
       end_game()
     end
   end
 
   def end_game
-    puts "Restart game or refresh to play again"
+    puts "Restart game or Refresh to play again"
   end
 end
 
