@@ -31,11 +31,12 @@ end
 
 class MainGame < Board
   
-  attr_accessor :player_symbol, :player_choice, :game_board, :random_choice, :updated_board, :winner, :name
+  attr_accessor :player_symbol, :player_choice, :game_board, :random_choice, :updated_board, :winner, :player_name
 
   @@count_turns = 0
 
   def message(player)
+    @player_name = player.name
     puts "Welcome #{player.name} to TicTacToe!"
     @symbol_choice = false
     until @symbol_choice
@@ -50,23 +51,27 @@ class MainGame < Board
     player_choices()
   end
 
-  def player_choices
-    # check choice is valid
-    @choice_complete = false  
-    until @choice_complete
+  def player_choices()
+    @player_choice_valid = false
+    until @player_choice_valid
       puts "Type the position string (e.g. A1) you want to choose:"
       @player_choice = gets.chomp.strip.upcase
-      # Edit code to ensure correct position can only be chosen.
-      @updated_board = game_board.each{|row| row.replace(row.map {|cell| cell.strip == player_choice ? cell = " #{player_symbol} " : cell = cell })}
-      @choice_complete = true
+      for i in (0..2)
+        for j in (0..2)
+          if player_choice == game_board[i][j].strip && player_choice != "X" && player_choice != "O"
+            puts "You chose #{player_choice} as shown on the board below: "
+            @player_choice_valid = true
+          end
+        end
+      end
     end
-    @@count_turns += 1
-    puts "You chose #{player_choice} as shown on the board below: "
+    @updated_board = game_board.each{|row| row.replace(row.map {|cell| cell.strip == player_choice ? cell = " #{player_symbol} " : cell = cell })}
     create_board(updated_board)
+    @@count_turns += 1
     @@count_turns == 9 ? draw_message() : computer_choice()
   end
 
-  def computer_choice
+  def computer_choice()
     if (player_symbol == "X")
       @computer_symbol = "O"
     elsif (player_symbol == "O")
@@ -89,7 +94,7 @@ class MainGame < Board
     win_check()
   end
 
-  def win_check
+  def win_check()
     @winner_declared = false
     # check rows and columns for win
     for i in (0..2)
@@ -114,12 +119,12 @@ class MainGame < Board
     @winner_declared ? win_message() : player_choices()
   end
 
-  def win_message
+  def win_message()
     if winner == player_symbol
-      puts "Congratulations #{self.name}, You Win!"
+      puts "Congratulations #{player_name}, You Win!"
       end_game()
     elsif winner == @computer_symbol
-      puts "Computer wins this time, better luck next time #{self.name}!"
+      puts "Computer wins this time, better luck next time #{player_name}!"
       end_game()
     end
   end
@@ -135,4 +140,4 @@ class MainGame < Board
 end
 
 player = Player.new
-test = MainGame.new.message(player)
+tictactoe = MainGame.new.message(player)
