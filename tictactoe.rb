@@ -25,7 +25,7 @@ class Player
   
   def initialize()
     puts "What is your name?"
-    @name = gets.chomp
+    @name = gets.chomp.capitalize
   end
 end
 
@@ -122,20 +122,30 @@ class MainGame < Board
   def win_message()
     if winner == player_symbol
       puts "Congratulations #{player_name}, You Win!"
-      end_game()
+      restart_game()
     elsif winner == @computer_symbol
       puts "Computer wins this time, better luck next time #{player_name}!"
-      end_game()
+      restart_game()
     end
   end
 
   def draw_message
     puts "This game is a draw, close one!"
-    end_game()
+    restart_game()
   end
 
-  def end_game
-    puts "Restart game or Refresh to play again"
+  def restart_game
+    @restart_selected = false
+    until @restart_selected
+      puts "Press R to restart the game."
+      @restart = gets.chomp.upcase
+      if @restart == "R"
+        @restart_selected = true
+      end
+    end
+  @@count_turns = 0
+  @player = Player.new
+  @tictactoe2 = MainGame.new.message(@player)
   end
 end
 
